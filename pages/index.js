@@ -3,11 +3,90 @@ import { useState, useEffect } from "react";
 import * as fcl from "@onflow/fcl";
 import * as types from "@onflow/types";
 import {create} from "ipfs-http-client";
-import { mintNFTTxx,viewNFTScript } from "./lib/code.js";
+//import { mintNFTTxx,viewNFTScript } from "./lib/code.js";
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
+const viewNFTScript = `import GameDay from 0x1703a215038c262f
+import NonFungibleToken from 0x631e88ae7f1d7c20
 
+pub fun main(account: Address): [String] {
+    let publicRefrence = getAccount(account).getCapability(/public/myGameDayCollection)
+    .borrow<&GameDay.Collection{GameDay.MyCollectionPublic}>()!
+  
+    let info: [String] = []
+    let nftRef = publicRefrence.borrowEntireNFT(id: publicRefrence.getIDs()[5])
+    info.append(nftRef.NFTUrl)
+    info.append(nftRef.Name)
+    
+  
+    //return publicRefrence.borrowEntireNFT(id: Id).NFTUrl
+    return info
+}`
+
+const mintNFTTxx = `import MetadataViews from 0x12ba346a5192ba0d
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import GameDay from 0x12ba346a5192ba0d
+import FungibleToken from 0x9a0766d93b6608b7
+
+transaction(
+  ImURL: String, 
+  Name: String,
+  NFTDescription: String,
+  NFTThumbnail: String,
+  cuts: UFix64,
+  royaltyDescriptions: String,
+  royaltyBeneficiaries: Address
+  ) {
+let royalties: [MetadataViews.Royalty]
+
+
+
+prepare(acct: AuthAccount) {
+  self.royalties = []
+  var count = 0
+  
+
+
+  let beneficiary = royaltyBeneficiaries
+  let beneficiaryCapability = getAccount(royaltyBeneficiaries)
+  .getCapability<&FungibleToken.Vault{FungibleToken.Receiver}>(MetadataViews.getRoyaltyReceiverPublicPath())
+  self.royalties.append(
+    MetadataViews.Royalty(
+      receiver: beneficiaryCapability,
+      cut: cuts,
+      description: royaltyDescriptions
+    )
+  )
+  count = count + 1
+
+  if acct.borrow<&GameDay.Collection>(from: /storage/myGameDayCollection) == nil {
+    acct.save(<- GameDay.createEmptyCollection(),  to: /storage/myGameDayCollection)
+    acct.link<&GameDay.Collection{GameDay.MyCollectionPublic}>(/public/myGameDayCollection, target: /storage/myGameDayCollection)
+  }
+
+  let NFTMinter = acct.borrow<&GameDay.NFTMinter>(from: /storage/Minter)
+                        ?? panic("Your address don't have Minter right")
+
+  let nftCollection = acct.borrow<&GameDay.Collection>(from: /storage/myGameDayCollection)
+                      ?? panic("Your address don't have Minter right")
+
+  nftCollection.deposit(token: <- NFTMinter.CreateNft(
+      NftUrl: ImURL, 
+      Name: Name, 
+      royalties: self.royalties,
+      _description: NFTDescription,
+      _thumbnail: NFTThumbnail))
+}
+
+pre {
+  cuts != nil && royaltyDescriptions != nil &&  royaltyBeneficiaries != nil: "Array length should be equal for royalty related details"
+}
+
+execute {
+  log("Minted NFT")
+}
+}`
 
 fcl.config()
 .put("accessNode.api", "https://access-testnet.onflow.org")
