@@ -7,7 +7,7 @@ import {create} from "ipfs-http-client";
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
-const viewNFTScript = `import GameDay from 0x1703a215038c262f
+const viewNFTScript = `import GameDay from 0x40d77146730593ba
 import NonFungibleToken from 0x631e88ae7f1d7c20
 
 pub fun main(account: Address): [String] {
@@ -24,9 +24,9 @@ pub fun main(account: Address): [String] {
     return info
 }`
 
-const mintNFTTxx = `import MetadataViews from 0x12ba346a5192ba0d
+const mintNFTTxx = `import MetadataViews from 0x40d77146730593ba
 import NonFungibleToken from 0x631e88ae7f1d7c20
-import GameDay from 0x12ba346a5192ba0d
+import GameDay from 0x40d77146730593ba
 import FungibleToken from 0x9a0766d93b6608b7
 
 transaction(
