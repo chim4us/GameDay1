@@ -33,6 +33,14 @@ button {
   border: none;
   outline: none;
 }
+.btn{
+  width: 100px;
+  height: 50px;
+  background-color:darkgreen;
+  color: aliceblue;
+  border: none;
+  outline: none;
+}
 
 img {
   width: 200px;
