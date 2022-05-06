@@ -7,21 +7,72 @@ import {create} from "ipfs-http-client";
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
-const viewNFTScript = `import GameDay from 0x40d77146730593ba
+const viewNFTScript = `
+import GameDay from 0x40d77146730593ba
 import NonFungibleToken from 0x631e88ae7f1d7c20
+import MetadataViews from 0x40d77146730593ba
 
-pub fun main(account: Address): [String] {
-    let publicRefrence = getAccount(account).getCapability(/public/myGameDayCollection)
-    .borrow<&GameDay.Collection{GameDay.MyCollectionPublic}>()!
+pub struct NFT {
+  pub let NFTUrl: String
+  pub let name: String
+  pub let description: String
+  pub let thumbnail: String
+  pub let owner: Address
+  pub let type: String
+  pub let royalties: [MetadataViews.Royalty]
   
-    let info: [String] = []
-    let nftRef = publicRefrence.borrowEntireNFT(id: publicRefrence.getIDs()[5])
-    info.append(nftRef.NFTUrl)
-    info.append(nftRef.Name)
-    
+
+  init(
+      NFTUrl: String,
+      name: String,
+      description: String,
+      thumbnail: String,
+      owner: Address,
+      nftType: String,
+      royalties: [MetadataViews.Royalty]
+  ) {
+      self.NFTUrl = NFTUrl
+      self.name = name
+      self.description = description
+      self.thumbnail = thumbnail
+      self.owner = owner
+      self.type = nftType
+      self.royalties = royalties
+  }
+}
+
+pub fun main(account: Address, Id: UInt64): NFT {
+  let publicRefrence = getAccount(account).getCapability(/public/myGameDayCollection)
+  .borrow<&GameDay.Collection{GameDay.MyCollectionPublic}>()!
+
+  let account = getAccount(account)
+  let collection = account
+      .getCapability(/public/myGameDayCollection)
+      .borrow<&GameDay.Collection{GameDay.MyCollectionPublic}>()
+      ?? panic("Could not borrow a reference to the collection")
+
+  let nft = collection.borrowEntireNFT(id: Id)!
+
+  let view = nft.resolveView(Type<MetadataViews.Display>())!
+
+  let expectedRoyaltyView = nft.resolveView(Type<MetadataViews.Royalties>())!
+
+  let royaltyView = expectedRoyaltyView as! MetadataViews.Royalties
+
+  let display = view as! MetadataViews.Display
   
-    //return publicRefrence.borrowEntireNFT(id: Id).NFTUrl
-    return info
+  let owner: Address = nft.owner!.address!
+  let nftType = nft.getType()
+
+  return NFT(
+      NFTUrl: nft.NFTUrl,
+      name: display.name,
+      description: display.description,
+      thumbnail: display.thumbnail.uri(),
+      owner: owner,
+      nftType: nftType.identifier,
+      royalties: royaltyView.getRoyalties()
+  )
 }`
 
 const mintNFTTxx = `import MetadataViews from 0x40d77146730593ba
@@ -86,6 +137,15 @@ pre {
 execute {
   log("Minted NFT")
 }
+}`
+
+const viewAllNFT = `import GameDay from 0x40d77146730593ba
+
+pub fun main(account: Address): [UInt64] {
+  let publicRefrence = getAccount(account).getCapability(/public/myGameDayCollection)
+  .borrow<&GameDay.Collection{GameDay.MyCollectionPublic}>()!
+
+    return publicRefrence.getIDs()
 }`
 
 fcl.config()
@@ -155,6 +215,23 @@ export default function Home() {
     console.log("transactionId: " + transactionId);
   }
 
+  const viewAll = async () => {
+    const result = await fcl.send([
+      fcl.script(viewAllNFT),
+      fcl.args([
+        fcl.arg(user.addr, types.Address)
+      ])
+    ]).then(fcl.decode);
+
+    console.log(result)
+
+    for(var i = 0; i <= result.length; i ++){
+      console.log(result[i])
+    }
+    
+    //setScriptResult();
+  }
+
   const view = async () => {
     const result = await fcl.send([
       fcl.script(viewNFTScript),
@@ -200,7 +277,7 @@ export default function Home() {
       <h1>Game Day</h1>
       {user && user.addr ? <h1>{user.addr}</h1>: null}
       <div>
-        <button onClick={() => logIn()}>Log In</button>
+        <button onClick={() => logIn()}>Log In</button>&nbsp;
         <button onClick={() => logOut()}>Log Out</button>
       </div>
       
@@ -258,7 +335,8 @@ export default function Home() {
       <div>View</div>
       <div>
         <input type="text" onChange={(e) => setInp(e.target.value)}/>
-        <button onClick={() => view()}>view</button>
+        <button onClick={() => view()}>view</button>&nbsp;
+        <button onClick={() => viewAll()}>View All ID's</button>
       </div>
 
       {scriptResult.length !== 0
