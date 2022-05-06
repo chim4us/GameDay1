@@ -281,6 +281,7 @@ export default function Home() {
         <button onClick={() => logOut()}>Log Out</button>
       </div>
       
+      
       <div>Mint</div>
       <div>
         <div className="form-control" >
