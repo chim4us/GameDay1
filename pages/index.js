@@ -117,10 +117,10 @@ prepare(acct: AuthAccount) {
   }
 
   let NFTMinter = acct.borrow<&GameDay.NFTMinter>(from: /storage/Minter)
-                        ?? panic("Your address don't have Minter right")
+                        ?? panic("Your address dont have Minter right")
 
   let nftCollection = acct.borrow<&GameDay.Collection>(from: /storage/myGameDayCollection)
-                      ?? panic("Your address don't have Minter right")
+                      ?? panic("Your address dont have Minter right")
 
   nftCollection.deposit(token: <- NFTMinter.CreateNft(
       NftUrl: ImURL, 
@@ -277,7 +277,7 @@ export default function Home() {
       <h1>Game Day</h1>
       {user && user.addr ? <h1>{user.addr}</h1>: null}
       <div>
-        <button onClick={() => logIn()}>Log In</button>
+        <button onClick={() => logIn()}>Log In</button>&nbsp;
         <button onClick={() => logOut()}>Log Out</button>
       </div>
 
@@ -286,46 +286,46 @@ export default function Home() {
       <div>
         <div className="form-control" >
             <label>Name</label>
-            <input type="text" placeholder = 'NFT Name' onChange={
+            <input type="text" placeholder = "NFT Name" onChange={
                 (e) => setName(e.target.value)
             }/>
         </div>
 
         <div className="form-control">
             <label>NFT Description</label>
-            <input type="text" placeholder = 'NFT Description' onChange={
+            <input type="text" placeholder = "NFT Description" onChange={
                 (e) => setNDesc(e.target.value)
             }/>
         </div>
         <div className="form-control">
             <label>NFT Thumbnail</label>
-            <input type="text" placeholder = 'NFT Thumbnail'  onChange={
+            <input type="text" placeholder = "NFT Thumbnail"  onChange={
                 (e) => setNThum(e.target.value)
             }/>
         </div>
 
         <div className="form-control">
             <label>Royalty Cuts</label>
-            <input type="text" placeholder = 'Royalty Cuts'  onChange={
+            <input type="text" placeholder = "Royalty Cuts"  onChange={
                 (e) => setRoyCut(e.target.value)
             }/>
         </div>
         
         <div className="form-control">
             <label>Royalty Descriptions</label>
-            <input type="text" placeholder = 'Royalty Descriptions'  onChange={
+            <input type="text" placeholder = "Royalty Descriptions"  onChange={
                 (e) => setRoyDesc(e.target.value)
             }/>
         </div>
 
         <div className="form-control">
             <label>Royalty Beneficiaries</label>
-            <input type="text" placeholder = 'Royalty Descriptions'  onChange={
+            <input type="text" placeholder = "Royalty Descriptions"  onChange={
                 (e) => setRoyBene(e.target.value)
             }/>
         </div>
         <div>
-          <input type="file" placeholder = 'NFT'  onChange={(e) => setFile(e.target.files[0])}/>
+          <input type="file" placeholder = "NFT"  onChange={(e) => setFile(e.target.files[0])}/>
         </div>
         <button onClick={() => mint()}>Mint</button>
         
@@ -336,9 +336,9 @@ export default function Home() {
       <div>View</div>
       <div>
         <input type="text" onChange={(e) => setInp(e.target.value)}/>
-        <button onClick={() => view()}>view</button>
+        <button onClick={() => view()}>view</button>&nbsp;
 
-        <button onClick={() => viewAll()}>View All ID's</button>
+        <button onClick={() => viewAll()}>View All IDs</button>
       </div>
 
       {scriptResult.length !== 0
