@@ -277,7 +277,7 @@ export default function Home() {
       <h1>Game Day</h1>
       {user && user.addr ? <h1>{user.addr}</h1>: null}
       <div>
-        <button onClick={() => logIn()}>Log In</button>'&nbsp;'
+        <button onClick={() => logIn()}>Log In</button>
         <button onClick={() => logOut()}>Log Out</button>
       </div>
 
@@ -336,7 +336,7 @@ export default function Home() {
       <div>View</div>
       <div>
         <input type="text" onChange={(e) => setInp(e.target.value)}/>
-        <button onClick={() => view()}>view</button>'&nbsp;'
+        <button onClick={() => view()}>view</button>
 
         <button onClick={() => viewAll()}>View All ID's</button>
       </div>
