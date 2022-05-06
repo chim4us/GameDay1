@@ -280,7 +280,7 @@ export default function Home() {
         <button onClick={() => logIn()}>Log In</button>
         <button onClick={() => logOut()}>Log Out</button>
       </div>
-      
+
       
       <div>Mint</div>
       <div>
@@ -337,6 +337,7 @@ export default function Home() {
       <div>
         <input type="text" onChange={(e) => setInp(e.target.value)}/>
         <button onClick={() => view()}>view</button>
+        
         <button onClick={() => viewAll()}>View All ID's</button>
       </div>
 
